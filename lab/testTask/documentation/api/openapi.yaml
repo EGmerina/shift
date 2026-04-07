@@ -1,0 +1,349 @@
+openapi: 3.0.3
+info:
+  title: Shift Lab CRM API
+  description: Упрощенная CRM-система для управления информацией о продавцах и их транзакциях.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Локальный сервер разработки
+tags:
+  - name: Sellers
+    description: Управление продавцами (CRUD)
+  - name: Transactions
+    description: Управление транзакциями (CRUD)
+  - name: Analytics
+    description: Аналитические вычисления
+
+paths:
+  /sellers:
+    get:
+      tags: [Sellers]
+      summary: Получить список всех продавцов
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SellerResponse'
+    post:
+      tags: [Sellers]
+      summary: Создать нового продавца
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SellerRequest'
+      responses:
+        '201':
+          description: Продавец успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerResponse'
+
+  /sellers/{id}:
+    get:
+      tags: [Sellers]
+      summary: Получить продавца по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Sellers]
+      summary: Обновить данные продавца
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SellerRequest'
+      responses:
+        '200':
+          description: Данные успешно обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Sellers]
+      summary: Удалить продавца (Soft Delete)
+      description: Логическое удаление продавца для сохранения историчности данных.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Продавец успешно удален (No Content)
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # --- ДОБАВЛЕННЫЙ МЕТОД ---
+  /sellers/{id}/transactions:
+    get:
+      tags: [Transactions]
+      summary: Получить все транзакции продавца
+      description: Возвращает список всех транзакций, привязанных к конкретному продавцу.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /transactions:
+    get:
+      tags: [Transactions]
+      summary: Получить список всех транзакций
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionResponse'
+    post:
+      tags: [Transactions]
+      summary: Создать новую транзакцию
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Транзакция успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+
+  /transactions/{id}:
+    get:
+      tags: [Transactions]
+      summary: Получить транзакцию по ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /analytics/best-seller:
+    get:
+      tags: [Analytics]
+      summary: Получить самого продуктивного продавца
+      description: Возвращает продавца с максимальной суммой транзакций за указанный период.
+      parameters:
+        - name: period
+          in: query
+          required: true
+          description: Период для анализа (день, месяц, квартал, год)
+          schema:
+            type: string
+            enum: [DAY, MONTH, QUARTER, YEAR]
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerResponse'
+
+  /analytics/best-time/{sellerId}:
+    get:
+      tags: [Analytics]
+      summary: Получить самое продуктивное время продавца
+      parameters:
+        - name: sellerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productivePeriod:
+                    type: string
+                    example: "14:00 - 15:00"
+
+  # --- ДОБАВЛЕННЫЙ МЕТОД ---
+  /analytics/sellers/sum-less-than:
+    get:
+      tags: [Analytics]
+      summary: Получить список продавцов с суммой меньше указанной
+      description: Возвращает список продавцов, у которых общая сумма всех транзакций строго меньше переданного значения.
+      parameters:
+        - name: amount
+          in: query
+          required: true
+          description: Пороговая сумма (эксклюзивно)
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: Успешный запрос
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SellerResponse'
+
+components:
+  schemas:
+    SellerRequest:
+      type: object
+      required:
+        - name
+        - contactInfo
+      properties:
+        name:
+          type: string
+          example: "Иван Иванов"
+        contactInfo:
+          type: string
+          example: "ivan@example.com, +79991234567"
+
+    SellerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Иван Иванов"
+        contactInfo:
+          type: string
+          example: "ivan@example.com, +79991234567"
+        registrationDate:
+          type: string
+          format: date-time
+          example: "2023-10-25T10:00:00Z"
+
+    TransactionRequest:
+      type: object
+      required:
+        - sellerId
+        - amount
+        - paymentType
+      properties:
+        sellerId:
+          type: integer
+          format: int64
+          example: 1
+        amount:
+          type: number
+          format: double
+          example: 1500.50
+        paymentType:
+          type: string
+          enum: [CASH, CARD, TRANSFER]
+          example: "CARD"
+
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 100
+        seller:
+          $ref: '#/components/schemas/SellerResponse'
+        amount:
+          type: number
+          format: double
+          example: 1500.50
+        paymentType:
+          type: string
+          example: "CARD"
+        transactionDate:
+          type: string
+          format: date-time
+          example: "2023-10-26T14:30:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+
+  responses:
+    NotFound:
+      description: Ресурс не найден
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
