@@ -3,9 +3,6 @@ package shift.sellersandtransactions.core.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import shift.sellersandtransactions.api.FileStatus;
-import shift.sellersandtransactions.api.dto.DetailedFileStatisticDto;
-import shift.sellersandtransactions.api.dto.FileIdResponseDto;
-import shift.sellersandtransactions.api.dto.FileResponseDto;
 import shift.sellersandtransactions.api.mapper.FileResponseMapper;
 import shift.sellersandtransactions.core.repository.UploadedFileRepository;
 

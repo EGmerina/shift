@@ -3,7 +3,6 @@ package shift.sellersandtransactions.api.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import shift.sellersandtransactions.api.dto.ClientResponseDto;
 
 @Mapper(componentModel = "spring")
 public interface ClientResponseMapper {

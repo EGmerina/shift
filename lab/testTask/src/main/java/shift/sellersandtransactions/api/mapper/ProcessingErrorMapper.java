@@ -4,8 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import shift.sellersandtransactions.api.ProcessingErrorCode;
-import shift.sellersandtransactions.api.dto.ProcessingErrorDto;
-import shift.sellersandtransactions.core.model.FileProcessingErrorEntity;
+import shift.sellersandtransactions.core.entity.FileProcessingErrorEntity;
 
 @Mapper(componentModel = "spring")
 public interface ProcessingErrorMapper {

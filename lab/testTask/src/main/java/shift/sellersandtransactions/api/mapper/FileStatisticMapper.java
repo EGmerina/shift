@@ -2,7 +2,6 @@ package shift.sellersandtransactions.api.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import shift.sellersandtransactions.api.dto.FileStatisticDto;
 
 @Mapper(componentModel = "spring")
 public interface FileStatisticMapper {

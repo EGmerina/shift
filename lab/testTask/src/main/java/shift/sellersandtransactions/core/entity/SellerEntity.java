@@ -1,4 +1,4 @@
-package shift.sellersandtransactions.core.model;
+package shift.sellersandtransactions.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,7 +42,7 @@ public class SellerEntity {
     // Связь: Один продавец может иметь много транзакций
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Transaction> transactions = new ArrayList<>();
+    private List<TransactionEntity> transactions = new ArrayList<>();
 
     // Этот метод автоматически выполнится перед первым сохранением в БД
     @PrePersist

@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import shift.sellersandtransactions.api.FileStatus;
-import shift.sellersandtransactions.api.dto.FileResponseDto;
 
 @Mapper(componentModel = "spring", uses = FileStatisticMapper.class)
 public interface FileResponseMapper {

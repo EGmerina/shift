@@ -1,4 +1,4 @@
-package shift.sellersandtransactions.core.model;
+package shift.sellersandtransactions.core.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,7 +22,7 @@ public class TransactionEntity {
     // Связь: Много транзакций могут принадлежать одному продавцу
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false) // Имя колонки в базе данных
-    private Seller seller;
+    private SellerEntity seller;
 
     @Column(nullable = false, precision = 10, scale = 2) // Ограничиваем формат числа
     private BigDecimal amount;

@@ -2,7 +2,6 @@ package shift.sellersandtransactions.api.contoller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shift.sellersandtransactions.api.dto.ClientResponseDto;
 import shift.sellersandtransactions.core.service.ClientService;
 
 import java.util.List;

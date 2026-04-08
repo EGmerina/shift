@@ -1,4 +1,4 @@
-package shift.sellersandtransactions.core.model;
+package shift.sellersandtransactions.core.entity;
 
 public enum PaymentType {
     CASH,

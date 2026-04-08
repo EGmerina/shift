@@ -5,9 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import shift.sellersandtransactions.api.FileStatus;
-import shift.sellersandtransactions.api.dto.DetailedFileStatisticDto;
-import shift.sellersandtransactions.api.dto.FileIdResponseDto;
-import shift.sellersandtransactions.api.dto.FileResponseDto;
 import shift.sellersandtransactions.core.service.FileService;
 
 import java.util.List;

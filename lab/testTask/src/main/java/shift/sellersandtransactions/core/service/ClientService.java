@@ -3,7 +3,6 @@ package shift.sellersandtransactions.core.service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shift.sellersandtransactions.api.dto.ClientResponseDto;
 import shift.sellersandtransactions.api.mapper.ClientResponseMapper;
 import shift.sellersandtransactions.core.repository.UserRepository;
 
