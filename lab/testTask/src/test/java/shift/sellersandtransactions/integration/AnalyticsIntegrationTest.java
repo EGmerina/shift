@@ -1,0 +1,78 @@
+package shift.sellersandtransactions.integration;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import shift.sellersandtransactions.core.entity.PaymentType;
+import shift.sellersandtransactions.core.entity.SellerEntity;
+import shift.sellersandtransactions.core.entity.TransactionEntity;
+import shift.sellersandtransactions.core.repository.SellerRepository;
+import shift.sellersandtransactions.core.repository.TransactionRepository;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
+class AnalyticsIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private SellerRepository sellerRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Test
+    @DisplayName("Интеграционный тест: Поиск лучшего продавца за период")
+    void shouldReturnBestSeller() throws Exception {
+        // 1. Создаем двух продавцов в H2
+        SellerEntity seller1 = createSeller("Продавец 1");
+        SellerEntity seller2 = createSeller("Продавец 2");
+
+        // 2. Продавец 1 сделал транзакцию на 100 рублей
+        createTransaction(seller1, new BigDecimal("100.00"));
+
+        // 3. Продавец 2 сделал транзакцию на 500 рублей (он должен победить)
+        createTransaction(seller2, new BigDecimal("500.00"));
+
+        // 4. Вызываем API аналитики за последний год
+        mockMvc.perform(get("/api/analytics/best-seller")
+                        .param("period", "YEAR"))
+                .andExpect(status().isOk())
+                // Проверяем, что в ответе именно Продавец 2
+                .andExpect(jsonPath("$.name", is("Продавец 2")));
+    }
+
+    // Вспомогательные методы для чистоты кода теста
+    private SellerEntity createSeller(String name) {
+        SellerEntity s = new SellerEntity();
+        s.setName(name);
+        s.setContactInfo("test@test.ru");
+        return sellerRepository.save(s);
+    }
+
+    private void createTransaction(SellerEntity seller, BigDecimal amount) {
+        TransactionEntity t = new TransactionEntity();
+        t.setSeller(seller);
+        t.setAmount(amount);
+        t.setPaymentType(PaymentType.CARD);
+        t.setTransactionDate(LocalDateTime.now());
+        transactionRepository.save(t);
+    }
+}

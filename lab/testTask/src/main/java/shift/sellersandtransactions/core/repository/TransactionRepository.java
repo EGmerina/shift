@@ -26,7 +26,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
      * Сортируем продавцов по убыванию суммы их транзакций.
      * Чтобы получить только одного (лучшего), мы передадим в этот метод объект Pageable с лимитом 1.
      */
-    @Query("SELECT t.seller FROM Transaction t " +
+    @Query("SELECT t.seller FROM TransactionEntity t " +
             "WHERE t.transactionDate >= :startDate AND t.transactionDate <= :endDate " +
             "GROUP BY t.seller " +
             "ORDER BY SUM(t.amount) DESC")

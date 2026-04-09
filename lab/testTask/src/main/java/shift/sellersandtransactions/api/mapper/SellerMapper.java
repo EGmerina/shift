@@ -16,7 +16,7 @@ public interface SellerMapper {
      */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "registrationDate", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
     @Mapping(target = "transactions", ignore = true)
     SellerEntity toEntity(SellerRequestDto request);
 

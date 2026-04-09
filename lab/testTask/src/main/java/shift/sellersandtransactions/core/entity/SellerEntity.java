@@ -37,7 +37,7 @@ public class SellerEntity {
 
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default
-    private boolean isDeleted = false; // Флаг для историчности данных
+    private Boolean isDeleted = false; // Флаг для историчности данных
 
     // Связь: Один продавец может иметь много транзакций
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

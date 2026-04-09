@@ -1,14 +1,20 @@
+server:
+  port: 8080 # Явно указываем порт, на котором запустится API
+
 spring:
   application:
     name: sellers-and-transactions
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/mydb
     username: admin
     password: admin
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
+      # Меняем на update, чтобы Hibernate сам создал таблицы на основе наших Entity
       ddl-auto: none
     show-sql: true
     open-in-view: false
@@ -19,3 +25,4 @@ spring:
   docker:
     compose:
       enabled: true
+      # file: docker-compose.yml # Можно раскомментировать, если файл называется иначе или лежит в другом месте
