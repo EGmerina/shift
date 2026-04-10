@@ -41,25 +41,17 @@ class AnalyticsIntegrationTest {
     @Test
     @DisplayName("Интеграционный тест: Поиск лучшего продавца за период")
     void shouldReturnBestSeller() throws Exception {
-        // 1. Создаем двух продавцов в H2
         SellerEntity seller1 = createSeller("Продавец 1");
         SellerEntity seller2 = createSeller("Продавец 2");
-
-        // 2. Продавец 1 сделал транзакцию на 100 рублей
         createTransaction(seller1, new BigDecimal("100.00"));
-
-        // 3. Продавец 2 сделал транзакцию на 500 рублей (он должен победить)
         createTransaction(seller2, new BigDecimal("500.00"));
 
-        // 4. Вызываем API аналитики за последний год
         mockMvc.perform(get("/api/analytics/best-seller")
                         .param("period", "YEAR"))
                 .andExpect(status().isOk())
-                // Проверяем, что в ответе именно Продавец 2
                 .andExpect(jsonPath("$.name", is("Продавец 2")));
     }
 
-    // Вспомогательные методы для чистоты кода теста
     private SellerEntity createSeller(String name) {
         SellerEntity s = new SellerEntity();
         s.setName(name);
