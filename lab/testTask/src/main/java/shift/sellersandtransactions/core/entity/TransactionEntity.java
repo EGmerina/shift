@@ -19,22 +19,20 @@ public class TransactionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Связь: Много транзакций могут принадлежать одному продавцу
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false) // Имя колонки в базе данных
+    @JoinColumn(name = "seller_id", nullable = false)
     private SellerEntity seller;
 
-    @Column(nullable = false, precision = 10, scale = 2) // Ограничиваем формат числа
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @Enumerated(EnumType.STRING) // Сохраняем в базе как текст ('CASH', 'CARD'...), а не как цифру
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_type", nullable = false)
     private PaymentType paymentType;
 
     @Column(name = "transaction_date", nullable = false, updatable = false)
     private LocalDateTime transactionDate;
 
-    // Автоматическое проставление времени при создании транзакции
     @PrePersist
     protected void onCreate() {
         this.transactionDate = LocalDateTime.now();

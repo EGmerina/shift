@@ -69,7 +69,7 @@ curl -X POST http://localhost:8080/api/sellers \
 **Успешный ответ (201 Created)**
 ```json
 {
-  "id": 4,
+  "id": 1,
   "name": "Магазин Электроники",
   "contactInfo": "electro@shift.ru",
   "registrationDate": "2026-04-09T20:06:58.106"
@@ -82,7 +82,7 @@ curl -X POST http://localhost:8080/api/sellers \
 curl -X POST http://localhost:8080/api/transactions \
 -H "Content-Type: application/json" \
 -d '{
-  "sellerId": 4,
+  "sellerId": 1,
   "amount": 25000.50,
   "paymentType": "CARD"
 }'
@@ -93,7 +93,7 @@ curl -X POST http://localhost:8080/api/transactions \
 {
   "id": 3,
   "seller": {
-    "id": 4,
+    "id": 1,
     "name": "Магазин Электроники",
     "contactInfo": "electro@shift.ru",
     "registrationDate": "2026-04-09T20:06:58.106"
@@ -114,7 +114,7 @@ curl -X GET "http://localhost:8080/api/analytics/transactions-less-than?amount=5
 ```json
 [
   {
-    "id": 4,
+    "id": 1,
     "name": "Магазин Электроники",
     "contactInfo": "electro@shift.ru",
     "registrationDate": "2026-04-09T20:06:58.106"

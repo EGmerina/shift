@@ -1,4 +1,4 @@
--- Создание таблицы продавцов
+
 CREATE TABLE sellers
 (
     id                BIGSERIAL PRIMARY KEY,
@@ -18,7 +18,7 @@ COMMENT ON COLUMN sellers.registration_date IS 'Дата и время реги�
 COMMENT ON COLUMN sellers.is_deleted IS 'Флаг мягкого удаления (true - удален, false - активен)';
 
 
--- Создание таблицы транзакций
+
 CREATE TABLE transactions
 (
     id               BIGSERIAL PRIMARY KEY,
@@ -30,9 +30,9 @@ CREATE TABLE transactions
     transaction_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Индекс для ускорения поиска транзакций по продавцу (пригодится для аналитики)
+
 CREATE INDEX idx_transactions_seller_id ON transactions (seller_id);
--- Индекс для ускорения фильтрации по датам
+
 CREATE INDEX idx_transactions_date ON transactions (transaction_date);
 
 COMMENT ON TABLE transactions IS 'Таблица для хранения транзакций продавцов';

@@ -13,11 +13,6 @@ import java.util.List;
 @Repository
 public interface SellerRepository extends JpaRepository<SellerEntity, Long> {
 
-    /**
-     * Аналитика: Найти всех продавцов, у которых сумма всех транзакций меньше заданного значения.
-     * Используем LEFT JOIN, чтобы учесть даже тех продавцов, у которых вообще нет транзакций
-     * (их сумма будет считаться как 0 благодаря COALESCE).
-     */
     @Query("SELECT s FROM SellerEntity s LEFT JOIN s.transactions t " +
             "GROUP BY s " +
             "HAVING COALESCE(SUM(t.amount), 0) < :amount")

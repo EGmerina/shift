@@ -1,27 +1,27 @@
 openapi: 3.0.3
 info:
   title: Shift Lab CRM API
-  description: Упрощенная CRM-система для управления информацией о продавцах и их транзакциях.
+  description: Описание CRM-системы для управления продавцами и их транзакциями.
   version: 1.0.0
 servers:
-  - url: http://localhost:8080/api
+  - url: http://localhost:8080
     description: Локальный сервер разработки
 tags:
   - name: Sellers
-    description: Управление продавцами (CRUD)
+    description: Управление продавцами
   - name: Transactions
-    description: Управление транзакциями (CRUD)
+    description: Управление транзакциями
   - name: Analytics
-    description: Аналитические вычисления
+    description: Аналитические эндпоинты
 
 paths:
-  /sellers:
+  /api/sellers:
     get:
       tags: [Sellers]
       summary: Получить список всех продавцов
       responses:
         '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -45,7 +45,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SellerResponse'
 
-  /sellers/{id}:
+  /api/sellers/{id}:
     get:
       tags: [Sellers]
       summary: Получить продавца по ID
@@ -58,7 +58,7 @@ paths:
             format: int64
       responses:
         '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -92,8 +92,8 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags: [Sellers]
-      summary: Удалить продавца (Soft Delete)
-      description: Логическое удаление продавца для сохранения историчности данных.
+      summary: Удалить продавца
+      description: Помечает продавца удаленным без физического уничтожения записей в БД.
       parameters:
         - name: id
           in: path
@@ -107,38 +107,22 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # --- ДОБАВЛЕННЫЙ МЕТОД ---
-  /sellers/{id}/transactions:
+  /api/transactions:
     get:
       tags: [Transactions]
-      summary: Получить все транзакции продавца
-      description: Возвращает список всех транзакций, привязанных к конкретному продавцу.
+      summary: Получить список транзакций (с фильтром по продавцу)
+      description: Возвращает все транзакции. Если передан параметр sellerId, возвращает транзакции только этого продавца.
       parameters:
-        - name: id
-          in: path
-          required: true
+        - name: sellerId
+          in: query
+          required: false
+          description: ID продавца для фильтрации транзакций
           schema:
             type: integer
             format: int64
       responses:
         '200':
-          description: Успешный запрос
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TransactionResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-  /transactions:
-    get:
-      tags: [Transactions]
-      summary: Получить список всех транзакций
-      responses:
-        '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -162,7 +146,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TransactionResponse'
 
-  /transactions/{id}:
+  /api/transactions/{id}:
     get:
       tags: [Transactions]
       summary: Получить транзакцию по ID
@@ -175,7 +159,7 @@ paths:
             format: int64
       responses:
         '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -183,28 +167,28 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /analytics/best-seller:
+  /api/analytics/best-seller:
     get:
       tags: [Analytics]
       summary: Получить самого продуктивного продавца
-      description: Возвращает продавца с максимальной суммой транзакций за указанный период.
+      description: Вычисляет продавца с максимальной суммой транзакций за указанный период.
       parameters:
         - name: period
           in: query
           required: true
-          description: Период для анализа (день, месяц, квартал, год)
+          description: Период для расчета (DAY, MONTH, QUARTER, YEAR)
           schema:
             type: string
             enum: [DAY, MONTH, QUARTER, YEAR]
       responses:
         '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SellerResponse'
 
-  /analytics/best-time/{sellerId}:
+  /api/analytics/best-time/{sellerId}:
     get:
       tags: [Analytics]
       summary: Получить самое продуктивное время продавца
@@ -217,7 +201,7 @@ paths:
             format: int64
       responses:
         '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -227,23 +211,22 @@ paths:
                     type: string
                     example: "14:00 - 15:00"
 
-  # --- ДОБАВЛЕННЫЙ МЕТОД ---
-  /analytics/sellers/sum-less-than:
+  /api/analytics/sellers/sum-less-than:
     get:
       tags: [Analytics]
       summary: Получить список продавцов с суммой меньше указанной
-      description: Возвращает список продавцов, у которых общая сумма всех транзакций строго меньше переданного значения.
+      description: Возвращает список продавцов, у которых сумма всех транзакций меньше указанного значения.
       parameters:
         - name: amount
           in: query
           required: true
-          description: Пороговая сумма (эксклюзивно)
+          description: Пороговая сумма
           schema:
             type: number
             format: double
       responses:
         '200':
-          description: Успешный запрос
+          description: Успешный ответ
           content:
             application/json:
               schema:
@@ -342,7 +325,7 @@ components:
 
   responses:
     NotFound:
-      description: Ресурс не найден
+      description: Объект не найден
       content:
         application/json:
           schema:

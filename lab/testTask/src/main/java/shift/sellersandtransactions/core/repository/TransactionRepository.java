@@ -14,18 +14,8 @@ import java.util.List;
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
 
-    /**
-     * Spring Data JPA сам "догадается", что этот метод должен искать
-     * все транзакции, где seller_id равен переданному значению.
-     * Нам даже не нужно писать SQL-запрос!
-     */
     List<TransactionEntity> findAllBySellerId(Long sellerId);
 
-    /**
-     * Аналитика: Найти самого продуктивного продавца за указанный период (от startDate до endDate).
-     * Сортируем продавцов по убыванию суммы их транзакций.
-     * Чтобы получить только одного (лучшего), мы передадим в этот метод объект Pageable с лимитом 1.
-     */
     @Query("SELECT t.seller FROM TransactionEntity t " +
             "WHERE t.transactionDate >= :startDate AND t.transactionDate <= :endDate " +
             "GROUP BY t.seller " +
@@ -34,4 +24,9 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                                                @Param("endDate") LocalDateTime endDate,
                                                Pageable pageable);
 
+    String findBestDay(Long sellerId, LocalDateTime start, LocalDateTime end, Pageable limitOne);
+
+    String findBestMonth(Long sellerId, LocalDateTime start, LocalDateTime end, Pageable limitOne);
+
+    String findBestYear(Long sellerId, LocalDateTime start, LocalDateTime end, Pageable limitOne);
 }

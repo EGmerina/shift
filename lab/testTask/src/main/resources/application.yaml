@@ -1,5 +1,5 @@
 server:
-  port: 8080 # Явно указываем порт, на котором запустится API
+  port: 8080
 
 spring:
   application:
@@ -14,7 +14,6 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      # Меняем на update, чтобы Hibernate сам создал таблицы на основе наших Entity
       ddl-auto: none
     show-sql: true
     open-in-view: false
@@ -25,4 +24,3 @@ spring:
   docker:
     compose:
       enabled: true
-      # file: docker-compose.yml # Можно раскомментировать, если файл называется иначе или лежит в другом месте

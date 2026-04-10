@@ -1,4 +1,4 @@
-package shift.sellersandtransactions.api.contoller;
+package shift.sellersandtransactions.api.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import shift.sellersandtransactions.api.dto.SellerRequestDto;
 import shift.sellersandtransactions.api.dto.SellerResponseDto;
-import shift.sellersandtransactions.api.dto.TransactionResponseDto;
 import shift.sellersandtransactions.core.service.SellerService;
 
 import java.util.List;
@@ -24,7 +23,7 @@ public class SellerController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // Возвращаем статус 201 Created при успешном создании
+    @ResponseStatus(HttpStatus.CREATED)
     public SellerResponseDto createSeller(@Valid @RequestBody SellerRequestDto request) {
         return sellerService.create(request);
     }
@@ -40,14 +39,10 @@ public class SellerController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // Возвращаем 204 No Content
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSeller(@PathVariable Long id) {
         sellerService.delete(id);
     }
 
-    // Тот самый добавленный метод для получения транзакций конкретного продавца
-    @GetMapping("/{id}/transactions")
-    public List<TransactionResponseDto> getSellerTransactions(@PathVariable Long id) {
-        return sellerService.getTransactionsBySellerId(id);
-    }
+
 }

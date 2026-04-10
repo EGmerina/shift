@@ -1,11 +1,14 @@
-package shift.sellersandtransactions.api.contoller;
+package shift.sellersandtransactions.api.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import shift.sellersandtransactions.api.dto.AnalyticsPeriod;
 import shift.sellersandtransactions.api.dto.SellerResponseDto;
 import shift.sellersandtransactions.core.service.AnalyticsService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -16,20 +19,21 @@ public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
 
-    // В параметрах запроса ожидаем: /api/analytics/best-seller?period=MONTH
     @GetMapping("/best-seller")
-    public SellerResponseDto getBestSeller(@RequestParam String period) {
+    public SellerResponseDto getBestSeller(@RequestParam AnalyticsPeriod period) {
         return analyticsService.getBestSeller(period);
     }
 
-    @GetMapping("/best-time/{sellerId}")
-    public Map<String, String> getBestTime(@PathVariable Long sellerId) {
-        String productivePeriod = analyticsService.getBestTimeForSeller(sellerId);
-        // Возвращаем простой JSON: {"productivePeriod": "14:00 - 15:00"}
-        return Map.of("productivePeriod", productivePeriod);
+    @GetMapping("/{sellerId}/best-period")
+    public String getBestPeriodForSeller(
+            @PathVariable Long sellerId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam AnalyticsPeriod periodType
+    ) {
+        return analyticsService.calculateBestPeriod(sellerId, startDate, endDate, periodType);
     }
 
-    // В параметрах запроса ожидаем: /api/analytics/sellers/sum-less-than?amount=100000
     @GetMapping("/sellers/sum-less-than")
     public List<SellerResponseDto> getSellersWithSumLessThan(@RequestParam BigDecimal amount) {
         return analyticsService.getSellersWithTotalSumLessThan(amount);
