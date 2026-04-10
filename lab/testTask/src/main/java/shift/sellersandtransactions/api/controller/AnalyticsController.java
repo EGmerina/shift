@@ -1,16 +1,14 @@
 package shift.sellersandtransactions.api.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import shift.sellersandtransactions.api.dto.AnalyticsPeriod;
+import shift.sellersandtransactions.api.dto.BestPeriodResponseDto;
 import shift.sellersandtransactions.api.dto.SellerResponseDto;
 import shift.sellersandtransactions.core.service.AnalyticsService;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -25,13 +23,10 @@ public class AnalyticsController {
     }
 
     @GetMapping("/{sellerId}/best-period")
-    public String getBestPeriodForSeller(
+    public BestPeriodResponseDto getBestPeriodForSeller(
             @PathVariable Long sellerId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam AnalyticsPeriod periodType
-    ) {
-        return analyticsService.calculateBestPeriod(sellerId, startDate, endDate, periodType);
+            @RequestParam(defaultValue = "7") int periodInDays) {
+        return analyticsService.calculateBestPeriod(sellerId, periodInDays);
     }
 
     @GetMapping("/sellers/sum-less-than")

@@ -24,9 +24,8 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
                                                @Param("endDate") LocalDateTime endDate,
                                                Pageable pageable);
 
-    String findBestDay(Long sellerId, LocalDateTime start, LocalDateTime end, Pageable limitOne);
 
-    String findBestMonth(Long sellerId, LocalDateTime start, LocalDateTime end, Pageable limitOne);
+    @Query("SELECT t.transactionDate FROM TransactionEntity t WHERE t.seller.id = :sellerId ORDER BY t.transactionDate ASC")
+    List<LocalDateTime> findAllTransactionDatesBySellerId(@Param("sellerId") Long sellerId);
 
-    String findBestYear(Long sellerId, LocalDateTime start, LocalDateTime end, Pageable limitOne);
 }

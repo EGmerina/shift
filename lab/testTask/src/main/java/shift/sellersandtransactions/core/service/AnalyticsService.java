@@ -3,23 +3,19 @@ package shift.sellersandtransactions.core.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shift.sellersandtransactions.api.dto.AnalyticsPeriod;
+import shift.sellersandtransactions.api.dto.BestPeriodResponseDto;
 import shift.sellersandtransactions.api.dto.SellerResponseDto;
 import shift.sellersandtransactions.api.mapper.SellerMapper;
-import shift.sellersandtransactions.core.entity.TransactionEntity;
 import shift.sellersandtransactions.core.repository.SellerRepository;
 import shift.sellersandtransactions.core.repository.TransactionRepository;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -28,8 +24,8 @@ public class AnalyticsService {
 
     private final SellerRepository sellerRepository;
     private final TransactionRepository transactionRepository;
-    private final SellerService sellerService;
     private final SellerMapper sellerMapper;
+    private final SellerService sellerService;
 
 
     public SellerResponseDto getBestSeller(AnalyticsPeriod period) {
@@ -64,19 +60,38 @@ public class AnalyticsService {
         };
     }
 
-    public String calculateBestPeriod(Long sellerId, LocalDate startDate, LocalDate endDate, AnalyticsPeriod periodType) {
+    public BestPeriodResponseDto calculateBestPeriod(Long sellerId, int periodInDays) {
 
-        // Превращаем LocalDate в LocalDateTime (начало и конец дня), если в БД транзакции хранятся с часами и минутами
-        LocalDateTime start = startDate.atStartOfDay();
-        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+        sellerService.getSellerOrThrow(sellerId);
+        List<LocalDateTime> dates = transactionRepository.findAllTransactionDatesBySellerId(sellerId);
 
-        Pageable limitOne = PageRequest.of(0, 1);
+        if (dates.isEmpty()) {
+            throw new EntityNotFoundException("У продавца нет транзакций");
+        }
+        int maxTransactions = 0;
+        LocalDateTime bestWindowStart = dates.getFirst();
 
-        return switch (periodType) {
-            case DAY -> transactionRepository.findBestDay(sellerId, start, end, limitOne);
-            case MONTH -> transactionRepository.findBestMonth(sellerId, start, end, limitOne);
-            case YEAR -> transactionRepository.findBestYear(sellerId, start, end, limitOne);
-            default -> throw new IllegalArgumentException("Выберите другой период (день, месяц, год)");
-        };
+        int left = 0;
+
+        for (int right = 0; right < dates.size(); right++) {
+            LocalDateTime rightDate = dates.get(right);
+            while (rightDate.isAfter(dates.get(left).plusDays(periodInDays))) {
+                left++;
+            }
+
+            int currentWindowSize = right - left + 1;
+            if (currentWindowSize > maxTransactions) {
+                maxTransactions = currentWindowSize;
+                bestWindowStart = dates.get(left);
+            }
+        }
+
+        return new BestPeriodResponseDto(
+                sellerId,
+                periodInDays,
+                bestWindowStart.toLocalDate(),
+                bestWindowStart.plusDays(periodInDays).toLocalDate(),
+                maxTransactions
+        );
     }
 }

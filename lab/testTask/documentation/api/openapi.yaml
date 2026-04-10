@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Shift Lab CRM API
-  description: Описание CRM-системы для управления продавцами и их транзакциями.
+  description: API CRM-системы для управления продавцами и их транзакциями.
   version: 1.0.0
 servers:
   - url: http://localhost:8080
@@ -12,7 +12,7 @@ tags:
   - name: Transactions
     description: Управление транзакциями
   - name: Analytics
-    description: Аналитические эндпоинты
+    description: Аналитические запросы
 
 paths:
   /api/sellers:
@@ -21,7 +21,7 @@ paths:
       summary: Получить список всех продавцов
       responses:
         '200':
-          description: Успешный ответ
+          description: Успешный ответ со списком продавцов
           content:
             application/json:
               schema:
@@ -93,7 +93,7 @@ paths:
     delete:
       tags: [Sellers]
       summary: Удалить продавца
-      description: Помечает продавца удаленным без физического уничтожения записей в БД.
+      description: Удаляет продавца.
       parameters:
         - name: id
           in: path
@@ -176,10 +176,10 @@ paths:
         - name: period
           in: query
           required: true
-          description: Период для расчета (DAY, MONTH, QUARTER, YEAR)
+          description: Период для анализа (DAY, WEEK, MONTH, YEAR)
           schema:
             type: string
-            enum: [DAY, MONTH, QUARTER, YEAR]
+            enum: [DAY, WEEK, MONTH, YEAR]
       responses:
         '200':
           description: Успешный ответ
@@ -188,34 +188,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/SellerResponse'
 
-  /api/analytics/best-time/{sellerId}:
+  /api/analytics/{sellerId}/best-period:
     get:
       tags: [Analytics]
-      summary: Получить самое продуктивное время продавца
+      summary: Найти лучший период продаж
+      description: Ищет заданный период времени (в днях), в течение которого продавец совершил наибольшее количество транзакций.
       parameters:
         - name: sellerId
           in: path
           required: true
+          description: ID продавца
           schema:
             type: integer
             format: int64
+        - name: periodInDays
+          in: query
+          required: false
+          description: Количество дней для скользящего окна (по умолчанию 7)
+          schema:
+            type: integer
+            default: 7
       responses:
         '200':
-          description: Успешный ответ
+          description: Успешный ответ с лучшим периодом
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  productivePeriod:
-                    type: string
-                    example: "14:00 - 15:00"
+                $ref: '#/components/schemas/BestPeriodResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /api/analytics/sellers/sum-less-than:
     get:
       tags: [Analytics]
-      summary: Получить список продавцов с суммой меньше указанной
-      description: Возвращает список продавцов, у которых сумма всех транзакций меньше указанного значения.
+      summary: Получить список продавцов с суммой транзакций меньше указанной
+      description: Возвращает список продавцов, у которых общая сумма транзакций меньше переданного значения.
       parameters:
         - name: amount
           in: query
@@ -308,6 +315,28 @@ components:
           format: date-time
           example: "2023-10-26T14:30:00Z"
 
+    BestPeriodResponse:
+      type: object
+      properties:
+        sellerId:
+          type: integer
+          format: int64
+          example: 5
+        periodInDays:
+          type: integer
+          example: 7
+        startDate:
+          type: string
+          format: date
+          example: "2023-10-01"
+        endDate:
+          type: string
+          format: date
+          example: "2023-10-08"
+        transactionCount:
+          type: integer
+          example: 42
+
     ErrorResponse:
       type: object
       properties:
@@ -325,7 +354,7 @@ components:
 
   responses:
     NotFound:
-      description: Объект не найден
+      description: Сущность не найдена
       content:
         application/json:
           schema:
